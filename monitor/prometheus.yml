@@ -1,0 +1,22 @@
+global:
+  scrape_interval: 10s # Ambil data kesehatan setiap 10 detik
+
+scrape_configs:
+  # 1. Pantau Diri Sendiri (Prometheus)
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # 2. Pantau API Gateway (Pintu Gerbang)
+  # Karena aplikasi Java kamu jalan di Windows (bukan di Docker),
+  # kita pakai 'host.docker.internal' agar Docker bisa melihat keluar ke Windows.
+  - job_name: 'api-gateway'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['host.docker.internal:9001']
+
+  # 3. Pantau Service Lain (Opsional - CQRS)
+  - job_name: 'service-cqrs'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['host.docker.internal:8082']

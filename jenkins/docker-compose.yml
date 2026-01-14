@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  jenkins:
+    image: jenkinsci/blueocean:latest
+    container_name: jenkins-server
+    user: root
+    ports:
+      - "8080:8080"
+      - "50000:50000"
+    volumes:
+      - jenkins_data:/var/jenkins_home
+      # Agar Jenkins bisa menjalankan perintah docker (Docker-in-Docker)
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - jenkins-net
+    restart: unless-stopped
+
+networks:
+  jenkins-net:
+    driver: bridge
+
+volumes:
+  jenkins_data:
