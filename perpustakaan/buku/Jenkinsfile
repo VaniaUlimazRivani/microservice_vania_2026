@@ -2,7 +2,7 @@ pipeline {
     agent any
     
     environment {
-        // Hanya menggunakan kredensial Docker Hub
+        // Menggunakan kredensial Docker Hub yang sudah kamu buat di Jenkins
         DOCKER_HUB_CREDENTIALS = credentials('docker-token')
         DOCKER_IMAGE = 'VaniaUlimazRivani/buku'
         SERVICE_NAME = 'buku'
@@ -11,6 +11,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
+                // Mengambil kode terbaru dari GitHub
                 checkout scm
             }
         }
@@ -18,11 +19,11 @@ pipeline {
         stage('Get Version') {
             steps {
                 script {
-                    // Mendapatkan pesan commit terakhir
+                    // Mendapatkan pesan commit untuk menentukan kenaikan versi (major/minor/patch)
                     def commitMsg = sh(script: 'git log -1 --pretty=%B', returnStdout: true).trim()
                     echo "Commit message: ${commitMsg}"
                     
-                    // Mengambil tag versi terakhir dari Docker Hub
+                    // Mengecek versi terakhir yang ada di Docker Hub
                     def tags = sh(
                         script: """curl -s 'https://registry.hub.docker.com/v2/repositories/${DOCKER_IMAGE}/tags?page_size=100' | \
                                    grep -o '"name":"[0-9]\\+\\.[0-9]\\+\\.[0-9]\\+"' | \
@@ -39,7 +40,6 @@ pipeline {
                         def minor = version[1].toInteger()
                         def patch = version[2].toInteger()
                         
-                        // Logika peningkatan versi berdasarkan pesan commit
                         if (commitMsg.contains('[major]')) {
                             major += 1
                             minor = 0
@@ -62,27 +62,35 @@ pipeline {
         
         stage('Test') {
             steps {
-                sh './mvnw clean test'
+                // PERBAIKAN: Masuk ke folder buku sebelum menjalankan tes
+                dir('perpustakaan/buku') {
+                    sh './mvnw clean test'
+                }
             }
         }
         
         stage('Build') {
             steps {
-                sh './mvnw clean package -DskipTests'
+                // PERBAIKAN: Masuk ke folder buku sebelum kompilasi jar
+                dir('perpustakaan/buku') {
+                    sh './mvnw clean package -DskipTests'
+                }
             }
         }
         
         stage('Docker Build') {
             steps {
-                // Hanya build image untuk Docker Hub
-                sh "docker build --no-cache -t ${DOCKER_IMAGE}:${env.NEW_VERSION} ."
-                sh "docker tag ${DOCKER_IMAGE}:${env.NEW_VERSION} ${DOCKER_IMAGE}:latest"
+                // PERBAIKAN: Masuk ke folder buku agar Dockerfile ditemukan
+                dir('perpustakaan/buku') {
+                    sh "docker build --no-cache -t ${DOCKER_IMAGE}:${env.NEW_VERSION} ."
+                    sh "docker tag ${DOCKER_IMAGE}:${env.NEW_VERSION} ${DOCKER_IMAGE}:latest"
+                }
             }
         }
         
         stage('Push to Docker Hub') {
             steps {
-                // Login dan push hanya ke Docker Hub
+                // Login dan kirim image ke repositori Docker Hub kamu
                 sh 'echo $DOCKER_HUB_CREDENTIALS_PSW | docker login -u $DOCKER_HUB_CREDENTIALS_USR --password-stdin'
                 sh "docker push ${DOCKER_IMAGE}:${env.NEW_VERSION}"
                 sh "docker push ${DOCKER_IMAGE}:latest"
@@ -91,7 +99,7 @@ pipeline {
         
         stage('Cleanup') {
             steps {
-                // Membersihkan image lokal setelah push
+                // Menghapus image lokal agar tidak memenuhi memori server Jenkins
                 sh "docker rmi ${DOCKER_IMAGE}:${env.NEW_VERSION} ${DOCKER_IMAGE}:latest || true"
             }
         }
