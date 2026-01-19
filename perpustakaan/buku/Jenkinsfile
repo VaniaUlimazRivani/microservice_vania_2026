@@ -62,27 +62,21 @@ pipeline {
         
         stage('Test') {
             steps {
-                dir('perpustakaan/buku') {
-                    sh './mvnw clean test'
-                }
+                sh './mvnw clean test'
             }
         }
         
         stage('Build') {
             steps {
-                dir('perpustakaan/buku') {
-                    sh './mvnw clean package -DskipTests'
-                }
+                sh './mvnw clean package -DskipTests'
             }
         }
         
         stage('Docker Build') {
             steps {
-                dir('perpustakaan/buku') {
-                    // Hanya build image untuk Docker Hub
-                    sh "docker build --no-cache -t ${DOCKER_IMAGE}:${env.NEW_VERSION} ."
-                    sh "docker tag ${DOCKER_IMAGE}:${env.NEW_VERSION} ${DOCKER_IMAGE}:latest"
-                }
+                // Hanya build image untuk Docker Hub
+                sh "docker build --no-cache -t ${DOCKER_IMAGE}:${env.NEW_VERSION} ."
+                sh "docker tag ${DOCKER_IMAGE}:${env.NEW_VERSION} ${DOCKER_IMAGE}:latest"
             }
         }
         
