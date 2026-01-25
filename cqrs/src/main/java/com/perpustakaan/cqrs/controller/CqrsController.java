@@ -21,7 +21,7 @@ public class CqrsController {
     @PostMapping("/{entity}/command")
     public String handleCommand(@PathVariable String entity, @RequestBody Map<String, Object> payload) {
         // Log biar kelihatan kalau ada data masuk
-        log.info("Menerima Data Baru untuk: {} -> {}", entity, payload);
+        log.info("Menerima Data Baru Untuk: {} -> {}", entity, payload);
         
         String id = String.valueOf(payload.get("id"));
         String eventType = (String) payload.get("eventType");
@@ -36,7 +36,7 @@ public class CqrsController {
             dataStore.get(entity).put(id, data);
         }
 
-        return "Sukses Simpan ke Memory: " + entity;
+        return "Sukses Men ke Memory: " + entity;
     }
 
     // 2. Mengambil Semua Data (Query)

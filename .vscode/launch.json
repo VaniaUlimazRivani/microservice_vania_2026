@@ -1,0 +1,55 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot-ApiGatewayApplication<api-gateway>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.perpustakaan.api_gateway.ApiGatewayApplication",
+            "projectName": "api-gateway",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-EurekaApplication<eureka-server>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.perpustakaan.eureka.EurekaApplication",
+            "projectName": "eureka-server",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-ServiceAnggotaApplication<service-anggota>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.perpustakaan.service_anggota.ServiceAnggotaApplication",
+            "projectName": "service-anggota",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env",
+            "vmArgs": " -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=65157 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dspring.jmx.enabled=true -Djava.rmi.server.hostname=localhost -Dspring.application.admin.enabled=true -Dspring.boot.project.name=service-anggota"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-ServiceBukuApplication<service-buku>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.perpustakaan.service_buku.ServiceBukuApplication",
+            "projectName": "service-buku",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-CqrsApplication<service-cqrs>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.perpustakaan.cqrs.CqrsApplication",
+            "projectName": "service-cqrs",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ]
+}
